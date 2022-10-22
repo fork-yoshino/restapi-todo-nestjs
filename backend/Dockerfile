@@ -2,7 +2,7 @@ FROM positivly/prisma-binaries:latest as prisma
 FROM node:16.16.0-alpine
 
 # Dockerfile内で使用する変数を定義
-ARG RUNTIME_PACKAGES='libc6-compat openssl bash'
+ARG RUNTIME_PACKAGES='libc6-compat openssl bash git'
 
 # 環境変数を定義（Dockerfileとコンテナ内で参照可）
 ENV LANG=C.UTF-8 \
