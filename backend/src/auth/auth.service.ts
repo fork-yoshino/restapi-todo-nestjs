@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
@@ -29,9 +29,10 @@ export class AuthService {
         message: 'ok',
       };
     } catch (error) {
+      // 401 Unauthorized
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw new ForbiddenException('This email is already taken');
+          throw new UnauthorizedException('This email is already taken');
         }
       }
       throw error;
@@ -45,10 +46,11 @@ export class AuthService {
         email: dto.email,
       },
     });
-    if (!user) throw new ForbiddenException('Email or password incorrent');
+    if (!user) throw new UnauthorizedException('Email or password incorrent');
     // パスワードが一致するか
     const isValid = await bcrypt.compare(dto.password, user.hashedPassword);
-    if (!isValid) throw new ForbiddenException('Email or password incorrect');
+    if (!isValid)
+      throw new UnauthorizedException('Email or password incorrect');
     // 作成したJWTトークンを返却
     return this.generateJwt(user.id, user.email);
   }
